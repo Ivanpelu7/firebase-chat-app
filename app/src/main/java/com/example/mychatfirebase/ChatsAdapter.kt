@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class ChatsAdapter(val chatsList: List<Chat>) : RecyclerView.Adapter<ChatViewHolder>() {
+class ChatsAdapter(val chatsList: MutableList<Usuario>) : RecyclerView.Adapter<ChatViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return ChatViewHolder(layoutInflater.inflate(R.layout.chat_item, parent, false));
@@ -26,7 +26,7 @@ class ChatViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     val tvNombre = view.findViewById<TextView>(R.id.tvNombre)
 
-    fun render(chat: Chat) {
-        tvNombre.text = chat.usuarioDestinatario.nombre
+    fun render(chat: Usuario) {
+        tvNombre.text = chat.nombre
     }
 }
