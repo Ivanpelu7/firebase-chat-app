@@ -41,6 +41,10 @@ class StartActivity : AppCompatActivity() {
     private fun comprobarSesion() {
         firebaseUser = Firebase.auth.currentUser
         if (firebaseUser != null) {
+            FirebaseUtil.getCurrentUserDocumentRef()
+                .get().addOnSuccessListener {
+
+                }
             val intent = Intent(this, MainActivity::class.java)
             Toast.makeText(this, "La sesión esta activa", Toast.LENGTH_SHORT).show()
             startActivity(intent)

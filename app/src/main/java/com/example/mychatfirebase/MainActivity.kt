@@ -1,13 +1,13 @@
 package com.example.mychatfirebase
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mychatfirebase.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.Filter
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -22,40 +22,29 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //initRecyclerView()
-        auth = Firebase.auth
-
-        binding.tvDatos.text = auth.currentUser!!.email
-
-        binding.btCerrarSesion.setOnClickListener {
-            cerrarSesion()
-        }
+        initUI()
     }
 
-    private fun initRecyclerView() {
-        val listaUsuarios = mutableListOf<Usuario>()
-        val adapter = ChatsAdapter(listaUsuarios)
+    private fun initUI() {
+        setUpRecyclerView()
+    }
 
-        db.collection("usuarios")
+    private fun setUpRecyclerView() {
+        binding.rvChats.layoutManager = LinearLayoutManager(this)
+        val listaChats = arrayListOf<Chat>()
+
+        FirebaseUtil.getChatsRef()
             .get()
-            .addOnSuccessListener { resultado ->
-                for (document in resultado) {
-                    val usuario = document.toObject(Usuario::class.java)
-                    binding.rvChats.adapter = adapter
-                    binding.rvChats.layoutManager = LinearLayoutManager(this)
-                    listaUsuarios.add(usuario)
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val chat: Chat = document.toObject(Chat::class.java)
+
+                    Log.d("chats", "${chat.nombreMiembro1} => ${chat.nombreMiembro2}")
+
+                    listaChats.add(chat)
+
+                    binding.rvChats.adapter = ChatsAdapter(listaChats)
                 }
-
             }
-            .addOnFailureListener { exception ->
-                Log.w("usuarios", "Error getting documents: ", exception)
-            }
-    }
-
-    private fun cerrarSesion() {
-        Firebase.auth.signOut()
-
-        val intent = Intent(this, StartActivity::class.java)
-        startActivity(intent)
     }
 }

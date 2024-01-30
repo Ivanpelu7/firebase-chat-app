@@ -36,24 +36,26 @@ class RegisterActivity : AppCompatActivity() {
             if (binding.etEmail.text.toString() != "" && binding.etPassword.text.toString() != "") {
                 val email = binding.etEmail.text.toString()
                 val password = binding.etPassword.text.toString()
-                createAccount(email, password)
+                val name = binding.etNombre.text.toString()
+                createAccount(email, password, name)
             }
         }
     }
 
-    private fun createAccount(email: String, password: String) {
-        // [START create_user_with_email]
+    private fun createAccount(email: String, password: String, name: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     val user = auth.currentUser
-                    guardarInformacionUsuario(user)
+
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
 
+                    if (user != null) {
+                        guardarUsuario(user, name)
+                    }
+
                 } else {
-                    // If sign in fails, display a message to the user.
                     Toast.makeText(
                         baseContext,
                         "Authentication failed.",
@@ -61,39 +63,19 @@ class RegisterActivity : AppCompatActivity() {
                     ).show()
                 }
             }
-        // [END create_user_with_email]
     }
 
-    fun guardarInformacionUsuario(user: FirebaseUser?) {
-        user?.let { user ->
-            // Crea un nuevo documento en la colección "usuarios" con el ID del usuario
-            val usuarioDocRef = db.collection("usuarios").document(user.uid)
+    private fun guardarUsuario(user: FirebaseUser, name: String) {
+        val usuario = Usuario(user.uid, name, user.email!!)
 
-            // Puedes agregar más campos según tus necesidades
-            val datosUsuario = hashMapOf(
-                "nombre" to "",
-                "correo" to user.email,
-                // Agrega otros campos según sea necesario
-            )
-
-            // Guarda la información del usuario en Firestore
-            usuarioDocRef.set(datosUsuario)
-                .addOnSuccessListener {
-                    Toast.makeText(
-                        baseContext,
-                        "Usuario creado correctamente.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-                .addOnFailureListener { e ->
-                    // Fallo al guardar la información del usuario
-                    // Manejar el error aquí
-                    Toast.makeText(
-                        baseContext,
-                        "Error al crear el usuario.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-        }
+        Firebase.firestore.collection("users").document(user.uid)
+            .set(usuario)
+            .addOnSuccessListener {
+                Toast.makeText(
+                    baseContext,
+                    "Usuario creado con éxito.",
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
     }
 }

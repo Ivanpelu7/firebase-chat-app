@@ -39,16 +39,13 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun signIn(email: String, password: String) {
-        // [START sign_in_with_email]
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     this.finish()
                 } else {
-                    // If sign in fails, display a message to the user.
                     Toast.makeText(
                         baseContext,
                         "Authentication failed.",
@@ -56,6 +53,5 @@ class LoginActivity : AppCompatActivity() {
                     ).show()
                 }
             }
-        // [END sign_in_with_email]
     }
 }
