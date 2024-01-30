@@ -5,5 +5,8 @@
     <color name="primary">#075E54</color>
     <color name="secondary">#128C7E</color>
     <color name="tertiary">#25D366</color>
+    <color name="message_sended">#1E88E5</color>
+    <color name="message_received">#7CB342</color>
+
 
 </resources>

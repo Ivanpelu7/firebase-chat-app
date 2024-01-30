@@ -61,13 +61,6 @@ class MainActivity : AppCompatActivity() {
         adapter = ChatAdapter(options, nombre)
         binding.rvChats.layoutManager = LinearLayoutManager(this)
         binding.rvChats.adapter = adapter
-
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (adapter != null) {
-            adapter.startListening()
-        }
+        adapter.startListening()
     }
 }

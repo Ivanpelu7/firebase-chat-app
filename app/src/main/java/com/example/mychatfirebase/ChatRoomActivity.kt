@@ -3,8 +3,12 @@ package com.example.mychatfirebase
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mychatfirebase.databinding.ActivityChatRoomBinding
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Query
 
 class ChatRoomActivity : AppCompatActivity() {
 
@@ -14,6 +18,7 @@ class ChatRoomActivity : AppCompatActivity() {
     private lateinit var myName: String
     private lateinit var idChat: String
     private lateinit var chat: Chat
+    private lateinit var adapter: MessagesAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,14 +33,13 @@ class ChatRoomActivity : AppCompatActivity() {
         userName = intent.getStringExtra("nombre").toString()
         userId = intent.getStringExtra("userId").toString()
         myName = intent.getStringExtra("myName").toString()
-        idChat = intent.getStringExtra("idChat").toString()
         binding.tvNombreUsuario.text = userName
         initListeners()
         initChat()
     }
 
     private fun initChat() {
-        val listaUsers = arrayListOf(FirebaseUtil.getCurrentUserID(), userId)
+        val listaUsers = arrayListOf(FirebaseUtil.getCurrentUserID(), userId).sorted()
 
         // Comprobar si ya existe ese chat
         FirebaseUtil.getChatsRef()
@@ -43,19 +47,43 @@ class ChatRoomActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener {
                 if (it == null || it.documents.isEmpty()) {
-                    val idAuto = FirebaseUtil.getChatsRef().document().id
+                    idChat = FirebaseUtil.getChatsRef().document().id
+                    chat = Chat(idChat, listaUsers, myName, userName)
+                    FirebaseUtil.getChatsRef().document(idChat).set(chat)
 
-                    chat = Chat(idAuto, listaUsers, myName, userName)
-
-                    FirebaseUtil.getChatsRef().document(idAuto).set(chat)
                 } else {
-
+                    for (document in it.documents) {
+                        idChat = document.getString("idChat").toString()
+                        Log.d("idchat", idChat)
+                    }
                 }
+
+                initRecyclerView()
             }
     }
 
     private fun initRecyclerView() {
+        val query: Query =
+            FirebaseUtil.getMessagesRef(idChat).orderBy("timestamp", Query.Direction.DESCENDING)
 
+        val options: FirestoreRecyclerOptions<Message> = FirestoreRecyclerOptions.Builder<Message>()
+            .setQuery(query, Message::class.java)
+            .build()
+
+        adapter = MessagesAdapter(options, applicationContext)
+        val manager = LinearLayoutManager(this)
+        manager.reverseLayout = true
+        manager.stackFromEnd = true
+        binding.rvMessages.layoutManager = manager
+        binding.rvMessages.adapter = adapter
+        adapter.startListening()
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                binding.rvMessages.scrollToPosition(0)
+            }
+        })
     }
 
     private fun initListeners() {
@@ -67,6 +95,7 @@ class ChatRoomActivity : AppCompatActivity() {
             val message = binding.etMessage.text.toString()
             if (message.isNotEmpty()) {
                 sendMessage(message)
+                binding.etMessage.text = null
             }
         }
     }
@@ -74,24 +103,13 @@ class ChatRoomActivity : AppCompatActivity() {
     private fun sendMessage(message: String) {
         val chatMap = mapOf<String, Any>(
             "lastMessageSenderId" to FirebaseUtil.getCurrentUserID(),
-            "lastMessageTimestamp" to Timestamp.now()
+            "lastMessageTimestamp" to Timestamp.now(),
+            "lastMessage" to message
         )
 
-        if (idChat != null) {
-            FirebaseUtil.getChatsRef().document(idChat).update(chatMap)
-            val message = Message(message, FirebaseUtil.getCurrentUserID(), Timestamp.now())
-            FirebaseUtil.getMessagesRef(idChat).add(message).addOnSuccessListener {
-            }
-        } else {
-            FirebaseUtil.getChatsRef().document(chat.idChat).update(chatMap)
-            val message = Message(message, FirebaseUtil.getCurrentUserID(), Timestamp.now())
-            FirebaseUtil.getMessagesRef(chat.idChat).add(message).addOnSuccessListener {
-            }
-        }
-
-
-
-
+        FirebaseUtil.getChatsRef().document(idChat).update(chatMap)
+        val message = Message(message, FirebaseUtil.getCurrentUserID(), Timestamp.now())
+        FirebaseUtil.getMessagesRef(idChat).add(message)
     }
 }
 

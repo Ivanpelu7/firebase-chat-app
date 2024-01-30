@@ -27,12 +27,21 @@ class ChatAdapter(options: FirestoreRecyclerOptions<Chat>, val nombre: String) :
         val tvNombre: TextView = itemView.findViewById(R.id.tvUser)
         val itemLayout: CardView = itemView.findViewById(R.id.itemLayout)
         val context = itemView.context
+        val tvTimestamp: TextView = itemView.findViewById(R.id.tvTimestamp)
+        val lastMessage: TextView = itemView.findViewById(R.id.tvLastMessage)
+
         fun render(chat: Chat, nombre: String) {
             if (nombre == chat.nombreMiembro1) {
                 tvNombre.text = chat.nombreMiembro2
             } else {
                 tvNombre.text = chat.nombreMiembro1
             }
+
+            if (chat.lastMessage.isNotEmpty() && chat.lastMessageTimestamp != null) {
+                tvTimestamp.text = FirebaseUtil.timestampToString(chat.lastMessageTimestamp!!)
+                lastMessage.text = chat.lastMessage
+            }
+
 
             itemLayout.setOnClickListener {
 
@@ -48,6 +57,7 @@ class ChatAdapter(options: FirestoreRecyclerOptions<Chat>, val nombre: String) :
                 intent.putExtra("idChat", chat.idChat)
                 intent.putExtra("nombre", tvNombre.text.toString())
                 intent.putExtra("userId", otherId)
+                intent.putExtra("myName", nombre)
 
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
