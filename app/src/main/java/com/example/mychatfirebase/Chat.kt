@@ -1,8 +1,8 @@
 package com.example.mychatfirebase
 
 data class Chat(
-    val miembro1: String = "",
-    val miembro2: String = "",
+    val usersId: ArrayList<String>? = null,
     val nombreMiembro1: String = "",
-    val nombreMiembro2: String = ""
+    val nombreMiembro2: String = "",
+    val lastMessageSenderId: String = ""
 )

@@ -21,4 +21,8 @@ object FirebaseUtil {
     fun getChatsRef() : CollectionReference {
         return Firebase.firestore.collection("chats")
     }
+
+    fun getUsersRef() : CollectionReference {
+        return Firebase.firestore.collection("users")
+    }
 }
