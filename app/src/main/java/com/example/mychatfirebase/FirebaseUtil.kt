@@ -25,4 +25,12 @@ object FirebaseUtil {
     fun getUsersRef() : CollectionReference {
         return Firebase.firestore.collection("users")
     }
+
+    fun getMessagesRef(chatId: String) : CollectionReference {
+        return Firebase.firestore.collection("chats").document(chatId).collection("messages")
+    }
+
+    fun getOneChatRef(): DocumentReference {
+        return Firebase.firestore.collection("chats").document()
+    }
 }

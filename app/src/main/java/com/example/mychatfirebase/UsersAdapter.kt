@@ -12,7 +12,7 @@ class UsersAdapter(val listaUsuarios: MutableList<Usuario>, val nombre: String) 
     RecyclerView.Adapter<UsuarioViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsuarioViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        return UsuarioViewHolder(layoutInflater.inflate(R.layout.chat_item, parent, false));
+        return UsuarioViewHolder(layoutInflater.inflate(R.layout.user_item, parent, false));
     }
 
     override fun onBindViewHolder(holder: UsuarioViewHolder, position: Int) {
@@ -35,8 +35,9 @@ class UsuarioViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         itemLayout.setOnClickListener {
             val intent = Intent(context, ChatRoomActivity::class.java)
             intent.putExtra("nombre", usuario.nombre)
-            intent.putExtra("id", usuario.idUsuario)
+            intent.putExtra("userId", usuario.idUsuario)
             intent.putExtra("myName", nombre)
+
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
         }

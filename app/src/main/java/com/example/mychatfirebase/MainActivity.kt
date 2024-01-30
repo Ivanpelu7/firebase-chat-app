@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mychatfirebase.databinding.ActivityMainBinding
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Filter
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var nombre: String
+    private lateinit var adapter: ChatAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +30,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
+        nombre = intent.getStringExtra("nombre").toString()
         setUpRecyclerView()
         initListeners()
-        nombre = intent.getStringExtra("nombre").toString()
+
     }
 
     private fun initListeners() {
@@ -48,24 +51,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpRecyclerView() {
-        binding.rvChats.layoutManager = LinearLayoutManager(this)
-        val listaChats = arrayListOf<Chat>()
-
-        FirebaseUtil.getChatsRef()
+        val query: Query = FirebaseUtil.getChatsRef()
             .whereArrayContains("usersId", FirebaseUtil.getCurrentUserID())
-            .addSnapshotListener { value, error ->
-                if (value != null) {
-                    for (document in value) {
-                        val chat: Chat = document.toObject(Chat::class.java)
 
-                        Log.d("chats", "${chat.nombreMiembro1} => ${chat.nombreMiembro2}")
+        val options: FirestoreRecyclerOptions<Chat> = FirestoreRecyclerOptions.Builder<Chat>()
+            .setQuery(query, Chat::class.java)
+            .build()
 
-                        listaChats.add(chat)
+        adapter = ChatAdapter(options, nombre)
+        binding.rvChats.layoutManager = LinearLayoutManager(this)
+        binding.rvChats.adapter = adapter
 
-                        binding.rvChats.adapter = ChatsAdapter(listaChats, nombre)
-                    }
-                }
-            }
+    }
 
+    override fun onStart() {
+        super.onStart()
+        if (adapter != null) {
+            adapter.startListening()
+        }
     }
 }
