@@ -2,7 +2,6 @@ package com.example.mychatfirebase
 
 import android.content.Intent
 import android.os.Bundle
-import android.window.OnBackInvokedDispatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mychatfirebase.databinding.ActivityMainBinding
@@ -50,19 +49,17 @@ class MainActivity : AppCompatActivity() {
     private fun setUpRecyclerView() {
         val query: Query = FirebaseUtil.getChatsRef()
             .whereArrayContains("usersId", FirebaseUtil.getCurrentUserID())
+            .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
+
 
         val options: FirestoreRecyclerOptions<Chat> = FirestoreRecyclerOptions.Builder<Chat>()
             .setQuery(query, Chat::class.java)
             .build()
 
-        adapter = ChatAdapter(options, nombre)
+        adapter = ChatAdapter(options)
         binding.rvChats.layoutManager = LinearLayoutManager(this)
         binding.rvChats.adapter = adapter
         adapter.startListening()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        adapter.stopListening()
-    }
 }

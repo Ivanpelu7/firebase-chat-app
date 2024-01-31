@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 object FirebaseUtil {
 
@@ -31,19 +32,14 @@ object FirebaseUtil {
         return Firebase.firestore.collection("chats").document(chatId).collection("messages")
     }
 
-    fun getOneChatRef(): DocumentReference {
-        return Firebase.firestore.collection("chats").document()
-    }
-
     fun timestampToString(timestamp: Timestamp): String {
-        return SimpleDateFormat("HH:MM").format(timestamp.toDate())
+        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(timestamp.toDate())
     }
-
-
 
     fun getOtherUserFromChat(userIds: List<String>): DocumentReference {
         if (userIds[0] == getCurrentUserID()) {
             return getUsersRef().document(userIds[1])
+
         } else {
             return getUsersRef().document(userIds[0])
         }

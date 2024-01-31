@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
@@ -23,19 +24,21 @@ class MessagesAdapter(options: FirestoreRecyclerOptions<Message>, val context: C
 
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val receivedMessage: TextView = itemView.findViewById(R.id.messageReceived)
-        val sendedMessage: TextView = itemView.findViewById(R.id.messageSended)
-
+        val receivedMessage: LinearLayout = itemView.findViewById(R.id.messageReceived)
+        val sendedMessage: LinearLayout = itemView.findViewById(R.id.messageSended)
+        val tvMessageSended: TextView = itemView.findViewById(R.id.tvMessageSended)
+        val tvReceivedMessage: TextView = itemView.findViewById(R.id.tvMessageReceived
+        )
         fun render(message: Message) {
             if (message.idSender == FirebaseUtil.getCurrentUserID()) {
                 receivedMessage.visibility = View.GONE
                 sendedMessage.visibility = View.VISIBLE
-                sendedMessage.text = message.message
+                tvMessageSended.text = message.message
 
             } else {
                 receivedMessage.visibility = View.VISIBLE
                 sendedMessage.visibility = View.GONE
-                receivedMessage.text = message.message
+                tvReceivedMessage.text = message.message
             }
         }
 

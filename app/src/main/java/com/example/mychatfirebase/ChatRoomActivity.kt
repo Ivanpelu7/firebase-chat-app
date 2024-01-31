@@ -16,10 +16,10 @@ class ChatRoomActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatRoomBinding
     private lateinit var userId: String
     private lateinit var userName: String
-    private lateinit var myName: String
     private lateinit var idChat: String
     private lateinit var chat: Chat
     private lateinit var adapter: MessagesAdapter
+    private var isOpen: Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +33,6 @@ class ChatRoomActivity : AppCompatActivity() {
     private fun initUI() {
         userName = intent.getStringExtra("nombre").toString()
         userId = intent.getStringExtra("userId").toString()
-        myName = intent.getStringExtra("myName").toString()
         binding.tvNombreUsuario.text = userName
         initListeners()
         initChat()
@@ -82,6 +81,17 @@ class ChatRoomActivity : AppCompatActivity() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
                 binding.rvMessages.scrollToPosition(0)
+
+                FirebaseUtil.getChatsRef().document(idChat)
+                    .get()
+                    .addOnSuccessListener {
+                        if (it.getString("lastMessageSenderId") != FirebaseUtil.getCurrentUserID()) {
+                            if (isOpen) {
+                                FirebaseUtil.getChatsRef().document(idChat)
+                                    .update("mensajesSinLeer", 0)
+                            }
+                        }
+                    }
             }
         })
     }
@@ -101,16 +111,28 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     private fun sendMessage(message: String) {
-        val chatMap = mapOf<String, Any>(
+        val chatMap = mapOf(
             "lastMessageSenderId" to FirebaseUtil.getCurrentUserID(),
             "lastMessageTimestamp" to Timestamp.now(),
-            "lastMessage" to message
+            "lastMessage" to message,
+            "mensajesSinLeer" to FieldValue.increment(1)
         )
 
         FirebaseUtil.getChatsRef().document(idChat).update(chatMap)
         val message = Message(message, FirebaseUtil.getCurrentUserID(), Timestamp.now())
         FirebaseUtil.getMessagesRef(idChat).add(message)
     }
+
+    override fun onStart() {
+        super.onStart()
+        isOpen = true
+    }
+
+    override fun onStop() {
+        super.onStop()
+        isOpen = false
+    }
+
 }
 
 
