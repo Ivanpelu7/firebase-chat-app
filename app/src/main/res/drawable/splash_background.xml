@@ -4,6 +4,6 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/icon" /> <!-- imagen centrada -->
+            android:src="@drawable/icon_whats" /> <!-- imagen centrada -->
     </item>
 </layer-list>

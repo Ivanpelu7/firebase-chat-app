@@ -1,11 +1,10 @@
 package com.example.mychatfirebase
 
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
@@ -38,5 +37,15 @@ object FirebaseUtil {
 
     fun timestampToString(timestamp: Timestamp): String {
         return SimpleDateFormat("HH:MM").format(timestamp.toDate())
+    }
+
+
+
+    fun getOtherUserFromChat(userIds: List<String>): DocumentReference {
+        if (userIds[0] == getCurrentUserID()) {
+            return getUsersRef().document(userIds[1])
+        } else {
+            return getUsersRef().document(userIds[0])
+        }
     }
 }

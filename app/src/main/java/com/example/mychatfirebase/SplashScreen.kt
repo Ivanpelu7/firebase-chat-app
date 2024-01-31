@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class SplashScreen : AppCompatActivity() {
@@ -14,8 +15,8 @@ class SplashScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
         // En la aplicación
+        Firebase.firestore.clearPersistence()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
     }
 
     private fun comprobarSesion() {
@@ -34,7 +35,7 @@ class SplashScreen : AppCompatActivity() {
 
 
         } else {
-            val intent = Intent(this, StartActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
         }

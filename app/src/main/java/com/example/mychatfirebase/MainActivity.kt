@@ -2,17 +2,13 @@ package com.example.mychatfirebase
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.window.OnBackInvokedDispatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mychatfirebase.databinding.ActivityMainBinding
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.Filter
-import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
@@ -45,8 +41,9 @@ class MainActivity : AppCompatActivity() {
 
         binding.ivExit.setOnClickListener {
             Firebase.auth.signOut()
-            val intent = Intent(this, StartActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 
@@ -62,5 +59,10 @@ class MainActivity : AppCompatActivity() {
         binding.rvChats.layoutManager = LinearLayoutManager(this)
         binding.rvChats.adapter = adapter
         adapter.startListening()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.stopListening()
     }
 }

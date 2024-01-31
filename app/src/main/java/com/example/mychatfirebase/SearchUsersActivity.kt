@@ -19,9 +19,10 @@ class SearchUsersActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
+        myName = intent.getStringExtra("name").toString()
         initListeners()
         mostrarUsuarios()
-        myName = intent.getStringExtra("name").toString()
+
     }
 
     private fun initListeners() {
@@ -36,6 +37,7 @@ class SearchUsersActivity : AppCompatActivity() {
         binding.rvUsers.layoutManager = LinearLayoutManager(this)
 
         FirebaseUtil.getUsersRef()
+            .whereNotEqualTo("nombre", myName)
             .get()
             .addOnSuccessListener {
                 for (usuario in it.documents) {

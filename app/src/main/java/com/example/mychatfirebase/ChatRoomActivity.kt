@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mychatfirebase.databinding.ActivityChatRoomBinding
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 
 class ChatRoomActivity : AppCompatActivity() {
@@ -48,7 +49,7 @@ class ChatRoomActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 if (it == null || it.documents.isEmpty()) {
                     idChat = FirebaseUtil.getChatsRef().document().id
-                    chat = Chat(idChat, listaUsers, myName, userName)
+                    chat = Chat(idChat, listaUsers)
                     FirebaseUtil.getChatsRef().document(idChat).set(chat)
 
                 } else {
@@ -73,7 +74,6 @@ class ChatRoomActivity : AppCompatActivity() {
         adapter = MessagesAdapter(options, applicationContext)
         val manager = LinearLayoutManager(this)
         manager.reverseLayout = true
-        manager.stackFromEnd = true
         binding.rvMessages.layoutManager = manager
         binding.rvMessages.adapter = adapter
         adapter.startListening()

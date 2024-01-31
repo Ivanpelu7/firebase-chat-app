@@ -31,13 +31,19 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun initListener() {
-        binding.btRegister.setOnClickListener {
+        binding.btRegistrarse.setOnClickListener {
             if (binding.etEmail.text.toString() != "" && binding.etPassword.text.toString() != "") {
                 val email = binding.etEmail.text.toString()
                 val password = binding.etPassword.text.toString()
                 val name = binding.etNombre.text.toString()
                 createAccount(email, password, name)
             }
+        }
+
+        binding.tvYaTengoCuenta.setOnClickListener {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 
@@ -50,6 +56,7 @@ class RegisterActivity : AppCompatActivity() {
                     val intent = Intent(this, MainActivity::class.java)
                     intent.putExtra("nombre", usuario.nombre)
                     startActivity(intent)
+                    finish()
 
                 } else {
                     Toast.makeText(

@@ -31,40 +31,40 @@ class ChatAdapter(options: FirestoreRecyclerOptions<Chat>, val nombre: String) :
         val lastMessage: TextView = itemView.findViewById(R.id.tvLastMessage)
 
         fun render(chat: Chat, nombre: String) {
-            if (nombre == chat.nombreMiembro1) {
-                tvNombre.text = chat.nombreMiembro2
-            } else {
-                tvNombre.text = chat.nombreMiembro1
-            }
+            FirebaseUtil.getOtherUserFromChat(chat.usersId!!)
+                .get()
+                .addOnSuccessListener {
+                    val usuario = it.toObject(Usuario::class.java)
 
-            if (chat.lastMessage.isNotEmpty() && chat.lastMessageTimestamp != null) {
-                tvTimestamp.text = FirebaseUtil.timestampToString(chat.lastMessageTimestamp!!)
-                lastMessage.text = chat.lastMessage
-            }
+                    tvNombre.text = usuario!!.nombre
 
+                    if (chat.lastMessage.isNotEmpty() && chat.lastMessageTimestamp != null) {
+                        tvTimestamp.text =
+                            FirebaseUtil.timestampToString(chat.lastMessageTimestamp!!)
 
-            itemLayout.setOnClickListener {
+                        if (chat.lastMessageSenderId == FirebaseUtil.getCurrentUserID()) {
+                            lastMessage.text = "Tu: ${chat.lastMessage}"
 
-                var otherId = ""
+                        } else {
+                            lastMessage.text = chat.lastMessage
+                        }
 
-                for (id in chat.usersId!!) {
-                    if (id != FirebaseUtil.getCurrentUserID()) {
-                        otherId = id
+                    } else {
+                        lastMessage.text = "No hay mensajes todavía"
+                    }
+
+                    itemLayout.setOnClickListener {
+                        val intent = Intent(context, ChatRoomActivity::class.java)
+                        intent.putExtra("idChat", chat.idChat)
+                        intent.putExtra("nombre", usuario.nombre)
+                        intent.putExtra("userId", usuario.idUsuario)
+                        intent.putExtra("myName", nombre)
+
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(intent)
+
                     }
                 }
-
-                val intent = Intent(context, ChatRoomActivity::class.java)
-                intent.putExtra("idChat", chat.idChat)
-                intent.putExtra("nombre", tvNombre.text.toString())
-                intent.putExtra("userId", otherId)
-                intent.putExtra("myName", nombre)
-
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(intent)
-
-            }
         }
-
-
     }
 }
