@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 
-class ChatAdapter(options: FirestoreRecyclerOptions<Chat>) :
+class ChatAdapter(val options: FirestoreRecyclerOptions<Chat>) :
     FirestoreRecyclerAdapter<Chat, ChatAdapter.ChatViewHolder>(options) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatAdapter.ChatViewHolder {
         return ChatViewHolder(
@@ -20,9 +20,10 @@ class ChatAdapter(options: FirestoreRecyclerOptions<Chat>) :
         )
     }
 
-    override fun onBindViewHolder(holder: ChatAdapter.ChatViewHolder, position: Int, model: Chat) {
+    override fun onBindViewHolder(holder: ChatViewHolder, position: Int, model: Chat) {
         holder.render(model)
     }
+
 
     class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -64,11 +65,6 @@ class ChatAdapter(options: FirestoreRecyclerOptions<Chat>) :
                                 lastMessage.text = "${stringRecortado}"
                             }
                         }
-
-
-
-                    } else {
-                        lastMessage.text = "No hay mensajes todavía"
                     }
 
                     if (chat.mensajesSinLeer > 0 && chat.lastMessageSenderId != FirebaseUtil.getCurrentUserID()) {
