@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +38,8 @@ class ChatAdapter(options: FirestoreRecyclerOptions<Chat>) :
                 .get()
                 .addOnSuccessListener {
                     val usuario = it.toObject(Usuario::class.java)
+
+                    itemLayout.visibility = View.VISIBLE
 
                     tvNombre.text = usuario!!.nombre
 
