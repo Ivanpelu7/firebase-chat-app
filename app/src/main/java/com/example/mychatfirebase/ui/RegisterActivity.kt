@@ -54,7 +54,7 @@ class RegisterActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     val usuario = Usuario(auth.uid!!, name, email)
                     guardarUsuario(usuario)
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, RecentChatsActivity::class.java)
                     intent.putExtra("nombre", usuario.nombre)
                     startActivity(intent)
                     finish()

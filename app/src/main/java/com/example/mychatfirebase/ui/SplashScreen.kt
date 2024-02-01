@@ -27,7 +27,7 @@ class SplashScreen : AppCompatActivity() {
                 .addOnSuccessListener {
                     val nombre = it.getString("nombre")
 
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, RecentChatsActivity::class.java)
                     intent.putExtra("nombre", nombre)
                     startActivity(intent)
                     finish()

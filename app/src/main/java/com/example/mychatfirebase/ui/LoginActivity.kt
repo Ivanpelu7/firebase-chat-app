@@ -58,7 +58,7 @@ class LoginActivity : AppCompatActivity() {
 
                             Log.d("usuario", "${it.data}")
 
-                            val intent = Intent(this, MainActivity::class.java)
+                            val intent = Intent(this, RecentChatsActivity::class.java)
                             intent.putExtra("nombre", nombre)
                             startActivity(intent)
                             finish()

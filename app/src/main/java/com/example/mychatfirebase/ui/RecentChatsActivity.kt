@@ -13,7 +13,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
 
-class MainActivity : AppCompatActivity() {
+class RecentChatsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
