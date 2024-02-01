@@ -1,9 +1,11 @@
-package com.example.mychatfirebase
+package com.example.mychatfirebase.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mychatfirebase.util.FirebaseUtil
+import com.example.mychatfirebase.adapter.UsersAdapter
+import com.example.mychatfirebase.model.Usuario
 import com.example.mychatfirebase.databinding.ActivitySearchUsersBinding
 
 class SearchUsersActivity : AppCompatActivity() {

@@ -1,4 +1,4 @@
-package com.example.mychatfirebase
+package com.example.mychatfirebase.adapter
 
 import android.content.Context
 import android.content.Intent
@@ -8,6 +8,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mychatfirebase.util.FirebaseUtil
+import com.example.mychatfirebase.R
+import com.example.mychatfirebase.model.Chat
+import com.example.mychatfirebase.model.Usuario
+import com.example.mychatfirebase.ui.ChatRoomActivity
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 

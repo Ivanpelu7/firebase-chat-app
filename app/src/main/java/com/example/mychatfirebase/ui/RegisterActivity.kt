@@ -1,9 +1,10 @@
-package com.example.mychatfirebase
+package com.example.mychatfirebase.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.mychatfirebase.model.Usuario
 import com.example.mychatfirebase.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth

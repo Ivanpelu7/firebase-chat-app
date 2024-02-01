@@ -1,9 +1,12 @@
-package com.example.mychatfirebase
+package com.example.mychatfirebase.ui
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.mychatfirebase.model.Chat
+import com.example.mychatfirebase.adapter.ChatAdapter
+import com.example.mychatfirebase.util.FirebaseUtil
 import com.example.mychatfirebase.databinding.ActivityMainBinding
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.auth.ktx.auth
