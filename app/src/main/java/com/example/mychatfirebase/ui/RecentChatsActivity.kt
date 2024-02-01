@@ -32,7 +32,7 @@ class RecentChatsActivity : AppCompatActivity() {
 
     private fun initListeners() {
         binding.ivSearch.setOnClickListener {
-            val intent = Intent(this, SearchUsersActivity::class.java)
+            val intent = Intent(this, UsersListActivity::class.java)
             startActivity(intent)
         }
 

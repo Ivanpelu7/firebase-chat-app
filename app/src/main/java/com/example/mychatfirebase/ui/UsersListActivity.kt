@@ -8,7 +8,7 @@ import com.example.mychatfirebase.adapter.UsersAdapter
 import com.example.mychatfirebase.model.Usuario
 import com.example.mychatfirebase.databinding.ActivitySearchUsersBinding
 
-class SearchUsersActivity : AppCompatActivity() {
+class UsersListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchUsersBinding
 
