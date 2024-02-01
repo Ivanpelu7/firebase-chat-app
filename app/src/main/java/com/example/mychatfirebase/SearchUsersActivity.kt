@@ -9,7 +9,7 @@ import com.example.mychatfirebase.databinding.ActivitySearchUsersBinding
 class SearchUsersActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchUsersBinding
-    private lateinit var myName: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchUsersBinding.inflate(layoutInflater)
@@ -19,10 +19,8 @@ class SearchUsersActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
-        myName = intent.getStringExtra("name").toString()
         initListeners()
         mostrarUsuarios()
-
     }
 
     private fun initListeners() {
@@ -37,10 +35,10 @@ class SearchUsersActivity : AppCompatActivity() {
         binding.rvUsers.layoutManager = LinearLayoutManager(this)
 
         FirebaseUtil.getUsersRef()
-            .whereNotEqualTo("nombre", myName)
+            .whereNotEqualTo("idUsuario", FirebaseUtil.getCurrentUserID())
             .get()
-            .addOnSuccessListener {
-                for (usuario in it.documents) {
+            .addOnSuccessListener { usuarios ->
+                for (usuario in usuarios.documents) {
                     val idUsuario = usuario.getString("idUsuario")
                     val nombre = usuario.getString("nombre")
                     val email = usuario.getString("email")
@@ -49,7 +47,7 @@ class SearchUsersActivity : AppCompatActivity() {
 
                     listaUsuarios.add(usuario)
 
-                    binding.rvUsers.adapter = UsersAdapter(listaUsuarios, myName)
+                    binding.rvUsers.adapter = UsersAdapter(listaUsuarios)
                 }
             }
     }

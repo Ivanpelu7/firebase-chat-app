@@ -75,7 +75,7 @@
                 android:minWidth="35dp"
                 android:minHeight="26dp"
                 android:textSize="14sp"
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:layout_marginTop="12dp"/>
 
         </LinearLayout>

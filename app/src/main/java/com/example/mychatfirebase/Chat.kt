@@ -10,3 +10,4 @@ data class Chat(
     var lastMessage: String = "",
     var mensajesSinLeer: Int = 0
 )
+

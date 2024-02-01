@@ -24,7 +24,6 @@ class SplashScreen : AppCompatActivity() {
             FirebaseUtil.getCurrentUserDocumentRef()
                 .get()
                 .addOnSuccessListener {
-                    Log.d("nombre", "${it.getString("nombre")}")
                     val nombre = it.getString("nombre")
 
                     val intent = Intent(this, MainActivity::class.java)

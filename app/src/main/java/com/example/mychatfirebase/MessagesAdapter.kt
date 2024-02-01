@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 
-class MessagesAdapter(options: FirestoreRecyclerOptions<Message>, val context: Context) : FirestoreRecyclerAdapter<Message, MessagesAdapter.MessageViewHolder>(options) {
+class MessagesAdapter(options: FirestoreRecyclerOptions<Message>) : FirestoreRecyclerAdapter<Message, MessagesAdapter.MessageViewHolder>(options) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         return MessageViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.message_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.message_item, parent, false)
         )
     }
 
@@ -24,10 +24,10 @@ class MessagesAdapter(options: FirestoreRecyclerOptions<Message>, val context: C
 
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val receivedMessage: LinearLayout = itemView.findViewById(R.id.messageReceived)
-        val sendedMessage: LinearLayout = itemView.findViewById(R.id.messageSended)
-        val tvMessageSended: TextView = itemView.findViewById(R.id.tvMessageSended)
-        val tvReceivedMessage: TextView = itemView.findViewById(R.id.tvMessageReceived
+        private val receivedMessage: LinearLayout = itemView.findViewById(R.id.messageReceived)
+        private val sendedMessage: LinearLayout = itemView.findViewById(R.id.messageSended)
+        private val tvMessageSended: TextView = itemView.findViewById(R.id.tvMessageSended)
+        private val tvReceivedMessage: TextView = itemView.findViewById(R.id.tvMessageReceived
         )
         fun render(message: Message) {
             if (message.idSender == FirebaseUtil.getCurrentUserID()) {
