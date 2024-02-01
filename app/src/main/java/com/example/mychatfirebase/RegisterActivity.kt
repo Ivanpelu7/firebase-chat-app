@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mychatfirebase.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -32,7 +31,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun initListener() {
-        binding.btRegister.setOnClickListener {
+        binding.btRegistrarse.setOnClickListener {
             if (binding.etEmail.text.toString() != "" && binding.etPassword.text.toString() != "") {
                 val email = binding.etEmail.text.toString()
                 val password = binding.etPassword.text.toString()
@@ -40,20 +39,24 @@ class RegisterActivity : AppCompatActivity() {
                 createAccount(email, password, name)
             }
         }
+
+        binding.tvYaTengoCuenta.setOnClickListener {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun createAccount(email: String, password: String, name: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val user = auth.currentUser
-
+                    val usuario = Usuario(auth.uid!!, name, email)
+                    guardarUsuario(usuario)
                     val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra("nombre", usuario.nombre)
                     startActivity(intent)
-
-                    if (user != null) {
-                        guardarUsuario(user, name)
-                    }
+                    finish()
 
                 } else {
                     Toast.makeText(
@@ -65,11 +68,9 @@ class RegisterActivity : AppCompatActivity() {
             }
     }
 
-    private fun guardarUsuario(user: FirebaseUser, name: String) {
-        val usuario = Usuario(user.uid, name, user.email!!)
-
-        Firebase.firestore.collection("users").document(user.uid)
-            .set(usuario)
+    private fun guardarUsuario(user: Usuario) {
+        Firebase.firestore.collection("users").document(user.idUsuario!!)
+            .set(user)
             .addOnSuccessListener {
                 Toast.makeText(
                     baseContext,

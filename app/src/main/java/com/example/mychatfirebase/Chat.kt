@@ -1,8 +1,12 @@
 package com.example.mychatfirebase
 
+import com.google.firebase.Timestamp
+
 data class Chat(
-    val miembro1: String = "",
-    val miembro2: String = "",
-    val nombreMiembro1: String = "",
-    val nombreMiembro2: String = ""
+    val idChat: String = "",
+    val usersId: List<String>? = null,
+    var lastMessageTimestamp: Timestamp? = Timestamp.now(),
+    var lastMessageSenderId: String = "",
+    var lastMessage: String = "",
+    var mensajesSinLeer: Int = 0
 )
