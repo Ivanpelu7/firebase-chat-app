@@ -50,7 +50,6 @@ dependencies {
     // Import the BoM for the Firebase platform
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.firebaseui:firebase-ui-firestore:8.0.2")
-    implementation("com.firebaseui:firebase-ui-auth:7.2.0")
 
 
     // Add the dependency for the Firebase Authentication library

@@ -1,6 +1,7 @@
 package com.example.mychatfirebase.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,7 @@ import com.example.mychatfirebase.databinding.ActivityChatRoomBinding
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.Query
 
 class ChatRoomActivity : AppCompatActivity() {
@@ -32,21 +34,16 @@ class ChatRoomActivity : AppCompatActivity() {
 
     private fun initUI() {
         getIntents()
-        binding.tvNombreUsuario.text = otherUserName
-        setUpRecyclerView()
         initListeners()
+        binding.tvNombreUsuario.text = otherUserName
+
+        checkIfChatExists()
     }
 
     private fun getIntents() {
         otherUserName = intent.getStringExtra("otherUserName").toString()
         otherUserID = intent.getStringExtra("otherUserID").toString()
-
-        if (!intent.hasExtra("chatID")) {
-            createNewChat()
-
-        } else {
-            chatID = intent.getStringExtra("chatID").toString()
-        }
+        chatID = intent.getStringExtra("chatID").toString()
     }
 
     private fun initListeners() {
@@ -63,11 +60,31 @@ class ChatRoomActivity : AppCompatActivity() {
         }
     }
 
-    private fun createNewChat() {
-        val chatUsers = arrayListOf(FirebaseUtil.getCurrentUserID(), otherUserID).sorted()
-        chatID = FirebaseUtil.getChatsRef().document().id
-        val newChat = Chat(chatID, chatUsers)
-        FirebaseUtil.getChatsRef().document(chatID).set(newChat)
+    private fun checkIfChatExists() {
+        val chatUsersList = listOf(
+            FirebaseUtil.getCurrentUserID(),
+            otherUserID
+        ).sorted()
+
+        FirebaseUtil.getChatsRef()
+            .whereEqualTo("usersId", chatUsersList)
+            .get()
+            .addOnSuccessListener { chats ->
+                Log.d("hola", "${chats.documents}")
+                if (chats.documents.isNotEmpty()) {
+                    Log.d("existe", "${chats.documents}")
+
+                    for (chat in chats) {
+                        chatID = chat.getString("idChat").toString()
+                    }
+
+                } else {
+                    chatID = FirebaseUtil.getChatsRef().document().id
+                    val newChat = Chat(chatID, chatUsersList)
+                    FirebaseUtil.getChatsRef().document(chatID).set(newChat)
+                }
+            }
+        setUpRecyclerView()
     }
 
     private fun setUpRecyclerView() {
