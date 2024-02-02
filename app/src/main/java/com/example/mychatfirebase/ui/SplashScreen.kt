@@ -1,10 +1,11 @@
-package com.example.mychatfirebase
+package com.example.mychatfirebase.ui
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.mychatfirebase.R
+import com.example.mychatfirebase.util.FirebaseUtil
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -24,10 +25,9 @@ class SplashScreen : AppCompatActivity() {
             FirebaseUtil.getCurrentUserDocumentRef()
                 .get()
                 .addOnSuccessListener {
-                    Log.d("nombre", "${it.getString("nombre")}")
                     val nombre = it.getString("nombre")
 
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, RecentChatsActivity::class.java)
                     intent.putExtra("nombre", nombre)
                     startActivity(intent)
                     finish()

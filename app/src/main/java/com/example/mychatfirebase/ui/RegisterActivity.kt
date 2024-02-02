@@ -1,9 +1,10 @@
-package com.example.mychatfirebase
+package com.example.mychatfirebase.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.mychatfirebase.model.Usuario
 import com.example.mychatfirebase.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -53,7 +54,7 @@ class RegisterActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     val usuario = Usuario(auth.uid!!, name, email)
                     guardarUsuario(usuario)
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, RecentChatsActivity::class.java)
                     intent.putExtra("nombre", usuario.nombre)
                     startActivity(intent)
                     finish()

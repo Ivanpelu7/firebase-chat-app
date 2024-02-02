@@ -1,4 +1,4 @@
-package com.example.mychatfirebase
+package com.example.mychatfirebase.model
 
 import com.google.firebase.Timestamp
 
@@ -10,3 +10,4 @@ data class Chat(
     var lastMessage: String = "",
     var mensajesSinLeer: Int = 0
 )
+
