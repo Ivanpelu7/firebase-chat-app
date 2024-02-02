@@ -43,7 +43,6 @@ class ChatRoomActivity : AppCompatActivity() {
     private fun getIntents() {
         otherUserName = intent.getStringExtra("otherUserName").toString()
         otherUserID = intent.getStringExtra("otherUserID").toString()
-        chatID = intent.getStringExtra("chatID").toString()
     }
 
     private fun initListeners() {
@@ -83,8 +82,9 @@ class ChatRoomActivity : AppCompatActivity() {
                     val newChat = Chat(chatID, chatUsersList)
                     FirebaseUtil.getChatsRef().document(chatID).set(newChat)
                 }
+
+                setUpRecyclerView()
             }
-        setUpRecyclerView()
     }
 
     private fun setUpRecyclerView() {
