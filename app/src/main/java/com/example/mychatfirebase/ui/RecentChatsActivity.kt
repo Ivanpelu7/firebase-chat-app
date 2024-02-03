@@ -55,10 +55,8 @@ class RecentChatsActivity : AppCompatActivity() {
             .build()
 
         val chatsAdapter = ChatAdapter(options)
-        binding.rvChats.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = chatsAdapter
-        }
+        binding.rvChats.layoutManager = LinearLayoutManager(this)
+        binding.rvChats.adapter = chatsAdapter
 
         chatsAdapter.startListening()
     }

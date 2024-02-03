@@ -69,9 +69,7 @@ class ChatRoomActivity : AppCompatActivity() {
             .whereEqualTo("usersId", chatUsersList)
             .get()
             .addOnSuccessListener { chats ->
-                Log.d("hola", "${chats.documents}")
                 if (chats.documents.isNotEmpty()) {
-                    Log.d("existe", "${chats.documents}")
 
                     for (chat in chats) {
                         chatID = chat.getString("idChat").toString()

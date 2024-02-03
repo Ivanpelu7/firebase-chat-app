@@ -48,7 +48,7 @@ class ChatAdapter(options: FirestoreRecyclerOptions<Chat>) :
 
                     tvNombre.text = usuario.nombre
 
-                    if (chat.lastMessage.isNotEmpty() && chat.lastMessageTimestamp != null) {
+                    if (chat.lastMessage != "" && chat.lastMessageTimestamp != null) {
                         tvTimestamp.text =
                             FirebaseUtil.timestampToString(chat.lastMessageTimestamp!!)
 
@@ -71,6 +71,9 @@ class ChatAdapter(options: FirestoreRecyclerOptions<Chat>) :
                                     chat.lastMessage
                                 }
                         }
+                    } else {
+                        lastMessage.text = null
+                        tvTimestamp.text = null
                     }
 
                     if (chat.mensajesSinLeer > 0 && chat.lastMessageSenderId != FirebaseUtil.getCurrentUserID()) {
