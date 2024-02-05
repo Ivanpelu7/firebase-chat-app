@@ -16,7 +16,7 @@ class UsersAdapter(val listaUsuarios: MutableList<Usuario>) :
     RecyclerView.Adapter<UsuarioViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsuarioViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        return UsuarioViewHolder(layoutInflater.inflate(R.layout.user_item, parent, false));
+        return UsuarioViewHolder(layoutInflater.inflate(R.layout.user_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: UsuarioViewHolder, position: Int) {
