@@ -1,27 +1,27 @@
 package com.example.mychatfirebase.ui
 
 import android.os.Bundle
-import android.util.Log
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mychatfirebase.model.Chat
+import com.example.mychatfirebase.data.model.Chat
 import com.example.mychatfirebase.util.FirebaseUtil
-import com.example.mychatfirebase.model.Message
+import com.example.mychatfirebase.data.model.Message
 import com.example.mychatfirebase.adapter.MessagesAdapter
 import com.example.mychatfirebase.databinding.ActivityChatRoomBinding
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.example.mychatfirebase.viewmodel.ChatRoomViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.Filter
-import com.google.firebase.firestore.Query
 
 class ChatRoomActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatRoomBinding
-    private lateinit var otherUserID: String
-    private lateinit var otherUserName: String
-    private lateinit var chatID: String
+    private lateinit var messagesAdapter: MessagesAdapter
+    private val chatRoomViewModel: ChatRoomViewModel by viewModels()
+    private lateinit var otherUserId: String
+    private lateinit var otherUsername: String
+    private lateinit var chatId: String
     private var isChatOpen: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,15 +34,35 @@ class ChatRoomActivity : AppCompatActivity() {
 
     private fun initUI() {
         getIntents()
-        initListeners()
-        binding.tvNombreUsuario.text = otherUserName
-
+        initObservers()
         checkIfChatExists()
+        binding.tvNombreUsuario.text = otherUsername
+        initListeners()
+        setUpRecyclerView()
+    }
+
+    private fun initObservers() {
+        chatRoomViewModel.messages.observe(this) { messagesList ->
+            messagesAdapter.updateList(messagesList)
+
+            binding.rvMessages.scrollToPosition(0)
+
+            if (messagesList.isNotEmpty()) {
+                if (!checkLastSenderID(messagesList.first()) && isChatOpen)
+                    restartUnreadMessages()
+            }
+
+        }
+
+        chatRoomViewModel.chatId.observe(this) { idChat ->
+            chatId = idChat
+            chatRoomViewModel.loadMessages(chatId)
+        }
     }
 
     private fun getIntents() {
-        otherUserName = intent.getStringExtra("otherUserName").toString()
-        otherUserID = intent.getStringExtra("otherUserID").toString()
+        otherUsername = intent.getStringExtra("otherUsername").toString()
+        otherUserId = intent.getStringExtra("otherUserId").toString()
     }
 
     private fun initListeners() {
@@ -60,81 +80,32 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     private fun checkIfChatExists() {
-        val chatUsersList = listOf(
+        val chatUsersId = listOf(
             FirebaseUtil.getCurrentUserID(),
-            otherUserID
+            otherUserId
         ).sorted()
 
-        FirebaseUtil.getChatsRef()
-            .whereEqualTo("usersId", chatUsersList)
-            .get()
-            .addOnSuccessListener { chats ->
-                if (chats.documents.isNotEmpty()) {
-
-                    for (chat in chats) {
-                        chatID = chat.getString("idChat").toString()
-                    }
-
-                } else {
-                    chatID = FirebaseUtil.getChatsRef().document().id
-                    val newChat = Chat(chatID, chatUsersList)
-                    FirebaseUtil.getChatsRef().document(chatID).set(newChat)
-                }
-
-                setUpRecyclerView()
-            }
+        chatRoomViewModel.checkIfChatExists(chatUsersId)
     }
 
     private fun setUpRecyclerView() {
-        val query: Query =
-            FirebaseUtil.getMessagesRef(chatID).orderBy("timestamp", Query.Direction.DESCENDING)
-
-        val options: FirestoreRecyclerOptions<Message> = FirestoreRecyclerOptions.Builder<Message>()
-            .setQuery(query, Message::class.java)
-            .build()
-
-        val messagesAdapter = MessagesAdapter(options)
+        messagesAdapter = MessagesAdapter()
         val manager = LinearLayoutManager(this).apply {
             reverseLayout = true
         }
+
         binding.rvMessages.apply {
             layoutManager = manager
             adapter = messagesAdapter
         }
-
-        messagesAdapter.startListening()
-
-        // Este código se ejecuta cada vez que aparece un nuevo mensaje en el chat
-        messagesAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                // Scroll automático hasta el nuevo mensaje
-                binding.rvMessages.scrollToPosition(0)
-
-                // Comprobar si no es el actual usuario el que ha enviado el último mensaje
-                // y si tiene el chat abierto para resetear los mensajes sin leer
-                if (checkLastSenderID() && isChatOpen) restartUnreadMessages()
-            }
-        })
     }
 
-    private fun checkLastSenderID(): Boolean {
-        var flag = false
-
-        FirebaseUtil.getChatsRef().document(chatID)
-            .get()
-            .addOnSuccessListener { message ->
-                if (message.getString("lastMessageSenderId") != FirebaseUtil.getCurrentUserID()) {
-                    flag = true
-                }
-            }
-
-        return flag
+    private fun checkLastSenderID(lastMessage: Message): Boolean {
+        return lastMessage.idSender == FirebaseUtil.getCurrentUserID()
     }
 
     private fun restartUnreadMessages() {
-        FirebaseUtil.getChatsRef().document(chatID)
-            .update("mensajesSinLeer", 0)
+        chatRoomViewModel.restartUnreadMessages(chatId)
     }
 
     private fun sendMessage(message: String) {
@@ -142,15 +113,15 @@ class ChatRoomActivity : AppCompatActivity() {
             "lastMessageSenderId" to FirebaseUtil.getCurrentUserID(),
             "lastMessageTimestamp" to Timestamp.now(),
             "lastMessage" to message,
-            "mensajesSinLeer" to FieldValue.increment(1)
+            "unreadMessages" to FieldValue.increment(1)
         )
 
         // Actualizamos los campos del chat con los datos del chatMap
-        FirebaseUtil.getChatsRef().document(chatID).update(chatMap)
+        chatRoomViewModel.updateChat(chatId, chatMap)
 
         // Añadimos el mensaje a la coleccion de mensajes del chat actual
-        val newMessage = Message(message, FirebaseUtil.getCurrentUserID(), Timestamp.now())
-        FirebaseUtil.getMessagesRef(chatID).add(newMessage)
+        val newMessage = Message(message, FirebaseUtil.getCurrentUserID())
+        chatRoomViewModel.addMessage(chatId, newMessage)
     }
 
     override fun onStop() {

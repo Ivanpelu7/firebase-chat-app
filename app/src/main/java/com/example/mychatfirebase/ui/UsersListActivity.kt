@@ -1,16 +1,21 @@
 package com.example.mychatfirebase.ui
 
 import android.os.Bundle
+import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mychatfirebase.util.FirebaseUtil
 import com.example.mychatfirebase.adapter.UsersAdapter
-import com.example.mychatfirebase.model.Usuario
+import com.example.mychatfirebase.data.model.User
 import com.example.mychatfirebase.databinding.ActivitySearchUsersBinding
+import com.example.mychatfirebase.viewmodel.UsersListViewModel
 
 class UsersListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchUsersBinding
+    private val usersListViewModel: UsersListViewModel by viewModels()
+    private lateinit var userAdapter: UsersAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,8 +26,27 @@ class UsersListActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
+        setUpRecyclerView()
         initListeners()
-        mostrarUsuarios()
+        initObservers()
+    }
+
+    private fun setUpRecyclerView() {
+        userAdapter = UsersAdapter()
+        binding.rvUsers.apply {
+            layoutManager = LinearLayoutManager(this@UsersListActivity)
+            adapter = userAdapter
+        }
+    }
+
+    private fun initObservers() {
+        usersListViewModel.users.observe(this) { userList ->
+            userAdapter.updateList(userList)
+        }
+
+        usersListViewModel.isLoading.observe(this) { isLoading ->
+            if (!isLoading) binding.progressBar.visibility = View.GONE
+        }
     }
 
     private fun initListeners() {
@@ -30,27 +54,5 @@ class UsersListActivity : AppCompatActivity() {
             onBackPressedDispatcher.onBackPressed()
         }
 
-    }
-
-    private fun mostrarUsuarios() {
-        val listaUsuarios = arrayListOf<Usuario>()
-        binding.rvUsers.layoutManager = LinearLayoutManager(this)
-
-        FirebaseUtil.getUsersRef()
-            .whereNotEqualTo("idUsuario", FirebaseUtil.getCurrentUserID())
-            .get()
-            .addOnSuccessListener { usuarios ->
-                for (usuario in usuarios.documents) {
-                    val idUsuario = usuario.getString("idUsuario")
-                    val nombre = usuario.getString("nombre")
-                    val email = usuario.getString("email")
-
-                    val usuario = Usuario(idUsuario, nombre, email!!)
-
-                    listaUsuarios.add(usuario)
-
-                    binding.rvUsers.adapter = UsersAdapter(listaUsuarios)
-                }
-            }
     }
 }

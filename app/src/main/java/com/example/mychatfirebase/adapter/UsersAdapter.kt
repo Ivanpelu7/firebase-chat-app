@@ -7,40 +7,49 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mychatfirebase.R
-import com.example.mychatfirebase.model.Usuario
+import com.example.mychatfirebase.data.model.User
 import com.example.mychatfirebase.ui.ChatRoomActivity
 
-class UsersAdapter(val listaUsuarios: MutableList<Usuario>) :
-    RecyclerView.Adapter<UsuarioViewHolder>() {
+class UsersAdapter(private var userList: List<User> = emptyList()) :
+    RecyclerView.Adapter<UsersAdapter.UsuarioViewHolder>() {
+
+    fun updateList(newList: List<User>) {
+        val diffResult = DiffUtil.calculateDiff(UsersDiffUtil(userList, newList))
+        userList = newList
+        diffResult.dispatchUpdatesTo(this)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsuarioViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         return UsuarioViewHolder(layoutInflater.inflate(R.layout.user_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: UsuarioViewHolder, position: Int) {
-        val item = listaUsuarios[position]
+        val item = userList[position]
         holder.render(item)
     }
 
-    override fun getItemCount(): Int = listaUsuarios.size
-}
+    override fun getItemCount(): Int = userList.size
 
-class UsuarioViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class UsuarioViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-    private val tvNombre: TextView = view.findViewById(R.id.tvUser)
-    private val itemLayout: CardView = view.findViewById(R.id.itemLayout)
-    val context: Context = view.context
+        private val tvNombre: TextView = view.findViewById(R.id.tvUser)
+        private val itemLayout: CardView = view.findViewById(R.id.itemLayout)
+        private val context: Context = view.context
 
-    fun render(usuario: Usuario) {
-        tvNombre.text = usuario.nombre
+        fun render(user: User) {
+            tvNombre.text = user.username
 
-        itemLayout.setOnClickListener {
-            val intent = Intent(context, ChatRoomActivity::class.java)
-            intent.putExtra("otherUserName", usuario.nombre)
-            intent.putExtra("otherUserID", usuario.idUsuario)
-            context.startActivity(intent)
+            itemLayout.setOnClickListener {
+                val intent = Intent(context, ChatRoomActivity::class.java)
+                intent.putExtra("otherUsername", user.username)
+                intent.putExtra("otherUserId", user.userId)
+                context.startActivity(intent)
+            }
         }
     }
 }
+

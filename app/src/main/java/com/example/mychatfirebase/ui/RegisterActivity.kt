@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mychatfirebase.model.Usuario
+import com.example.mychatfirebase.data.model.User
 import com.example.mychatfirebase.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -52,10 +52,9 @@ class RegisterActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val usuario = Usuario(auth.uid!!, name, email)
-                    guardarUsuario(usuario)
+                    val user = User(auth.uid!!, name, email)
+                    saveUser(user)
                     val intent = Intent(this, RecentChatsActivity::class.java)
-                    intent.putExtra("nombre", usuario.nombre)
                     startActivity(intent)
                     finish()
 
@@ -69,8 +68,8 @@ class RegisterActivity : AppCompatActivity() {
             }
     }
 
-    private fun guardarUsuario(user: Usuario) {
-        Firebase.firestore.collection("users").document(user.idUsuario!!)
+    private fun saveUser(user: User) {
+        Firebase.firestore.collection("users").document(user.userId!!)
             .set(user)
             .addOnSuccessListener {
                 Toast.makeText(

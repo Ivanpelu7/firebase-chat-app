@@ -2,20 +2,22 @@ package com.example.mychatfirebase.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.mychatfirebase.model.Chat
 import com.example.mychatfirebase.adapter.ChatAdapter
-import com.example.mychatfirebase.util.FirebaseUtil
 import com.example.mychatfirebase.databinding.ActivityMainBinding
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.example.mychatfirebase.viewmodel.RecentChatsViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.Query
 import com.google.firebase.ktx.Firebase
 
 class RecentChatsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val recentChatsViewModel: RecentChatsViewModel by viewModels()
+    private lateinit var recyclerAdapter: ChatAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,8 +28,19 @@ class RecentChatsActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
-        initListeners()
         setUpRecyclerView()
+        initListeners()
+        initObservers()
+    }
+
+    private fun initObservers() {
+        recentChatsViewModel.recentChats.observe(this) { recentChats ->
+            recyclerAdapter.updateList(recentChats)
+        }
+
+        recentChatsViewModel.isLoading.observe(this) { isLoading ->
+            if (!isLoading) binding.progressBar.visibility = View.GONE
+        }
     }
 
     private fun initListeners() {
@@ -45,20 +58,9 @@ class RecentChatsActivity : AppCompatActivity() {
     }
 
     private fun setUpRecyclerView() {
-        val query: Query = FirebaseUtil.getChatsRef()
-            .whereArrayContains("usersId", FirebaseUtil.getCurrentUserID())
-            .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
-
-
-        val options: FirestoreRecyclerOptions<Chat> = FirestoreRecyclerOptions.Builder<Chat>()
-            .setQuery(query, Chat::class.java)
-            .build()
-
-        val chatsAdapter = ChatAdapter(options)
+        recyclerAdapter = ChatAdapter()
         binding.rvChats.layoutManager = LinearLayoutManager(this)
-        binding.rvChats.adapter = chatsAdapter
-
-        chatsAdapter.startListening()
+        binding.rvChats.adapter = recyclerAdapter
     }
 
 }

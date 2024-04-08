@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
@@ -15,19 +16,19 @@ object FirebaseUtil {
         return Firebase.auth.currentUser!!.uid
     }
 
-    fun getCurrentUserDocumentRef() : DocumentReference {
+    fun getCurrentUserDocumentRef(): DocumentReference {
         return Firebase.firestore.collection("users").document(getCurrentUserID())
     }
 
-    fun getChatsRef() : CollectionReference {
+    fun getChatsRef(): CollectionReference {
         return Firebase.firestore.collection("chats")
     }
 
-    fun getUsersRef() : CollectionReference {
+    fun getUsersRef(): CollectionReference {
         return Firebase.firestore.collection("users")
     }
 
-    fun getMessagesRef(chatId: String) : CollectionReference {
+    fun getMessagesRef(chatId: String): CollectionReference {
         return Firebase.firestore.collection("chats").document(chatId).collection("messages")
     }
 
